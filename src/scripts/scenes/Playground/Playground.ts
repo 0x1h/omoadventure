@@ -1,5 +1,4 @@
 import Phaser from 'phaser'
-import { Preload } from './Preload'
 
 export class Playground extends Phaser.Scene {
   constructor() {
@@ -7,17 +6,14 @@ export class Playground extends Phaser.Scene {
   }
 
   preload() {
-    this.load.tilemapTiledJSON('map', 'assets/sprites/crystal_world_map.json')
-    this.load.image('tiles-1', 'assets/sprites/main_lev_build_1.png')
-    this.load.image('tiles-2', 'assets/sprites/main_lev_build_2.png')
+    this.load.tilemapTiledJSON('map', 'assets/sprites/omotemplate.json')
+    this.load.image('tiles-1', 'assets/sprites/grass.png')
   }
 
   create() {
     const map = this.make.tilemap({key: "map"})
-    const tielset = map.addTilesetImage('main_lev_build_1', 'tiles-1')
-    // const tielset2 = map.addTilesetImage('main_lev_build_2', 'tiles-2')
+    const tielset = map.addTilesetImage('grass_template', 'tiles-1')
 
-    map.createLayer('environment', tielset)
     map.createLayer('platforms', tielset)
   } 
 }
