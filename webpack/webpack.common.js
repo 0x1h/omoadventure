@@ -15,7 +15,7 @@ module.exports = {
   module: {
     rules: [{ test: /\.tsx?$|\.jsx?$/, include: path.join(__dirname, '../src'), loader: 'ts-loader' }]
   },
-  optimization: {
+  optimization: { 
     splitChunks: {
       cacheGroups: {
         commons: {
@@ -28,13 +28,11 @@ module.exports = {
     }
   },
   plugins: [
-    new HtmlWebpackPlugin({ gameName: 'My Phaser Game', template: 'src/index.html' }),
+    new HtmlWebpackPlugin({ gameName: 'OMOADVENDTURE', template: 'src/index.html' }),
     new CopyWebpackPlugin({
       patterns: [
         { from: 'src/assets', to: 'assets' },
-        { from: 'src/audios', to: 'audios' },
-        { from: 'pwa', to: '' },
-        { from: 'src/favicon.ico', to: '' }
+        { from: 'src/audios', to: 'audios' }
       ]
     })
   ]
