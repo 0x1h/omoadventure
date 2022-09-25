@@ -8,7 +8,7 @@ import { Playground } from './scenes/Playground'
 const config = {
   ...SHARED_CONFIG,
   // scene: [new MenuScene(SHARED_CONFIG), Playground],
-  scene: [Home, Playground]
+  scene: [Playground, Home]
 }
 
 window.addEventListener('load', () => {

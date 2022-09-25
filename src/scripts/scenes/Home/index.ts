@@ -49,10 +49,6 @@ export class Home extends Phaser.Scene {
 
     this.followCamera(this.player)
     this.alert = new Alert(this)
-
-    if (this.alert) {
-      console.log(this.alert.text)
-    }
   }
 
   createPlayer() {
@@ -67,15 +63,6 @@ export class Home extends Phaser.Scene {
   }
 
   update(): void {
-    // console.log({
-    //   x: this.player?.x,
-    //   y: this.player?.y
-    // })
-
-    // console.log(this.laptop?.scene === undefined){
-    //   {x: 1091.8999999999999, y: 247.89999999999998}
-    // }
-
     if (this.laptop?.scene === undefined) {
       if(this.player!.x >= 1090 && this.player!.y >= 247){
         this.scene.start('Playground')
