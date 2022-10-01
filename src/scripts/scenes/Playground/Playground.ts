@@ -4,7 +4,12 @@ import Player from './Player'
 export class Playground extends Phaser.Scene {
   cursors: null | Phaser.Types.Input.Keyboard.CursorKeys
   player: null | Phaser.Physics.Arcade.Sprite
+
   makho: null | Phaser.Physics.Arcade.Sprite
+  rostomi: Phaser.Physics.Arcade.Sprite
+  gurami: null | Phaser.Physics.Arcade.Sprite
+  nikolozi: null | Phaser.Physics.Arcade.Sprite
+  nika: null | Phaser.Physics.Arcade.Sprite
 
   constructor() {
     super({ key: 'Playground' })
@@ -15,7 +20,15 @@ export class Playground extends Phaser.Scene {
     this.load.image('tiles-2', 'assets/sprites/grass.png')
     this.load.image('sky', 'assets/sprites/sky.png')
     this.load.tilemapTiledJSON('map', 'assets/sprites/omotemplate.json')
+    
+    
     this.load.image('makho', 'assets/sprites/makho.png')
+    this.load.image('rostomi', 'assets/sprites/rostomi.png')
+    this.load.image('nikolozi', 'assets/sprites/nikolozi.png')
+    this.load.image('nika', 'assets/sprites/nikakh.png')
+    this.load.image('gurami', 'assets/sprites/gurami.png')
+  
+
     this.load.image('player', 'assets/sprites/player/movements/idle01.png')
     this.cursors = this.input.keyboard.createCursorKeys()
   }
@@ -27,8 +40,20 @@ export class Playground extends Phaser.Scene {
     const tileset = map.addTilesetImage('grass_template', 'tiles-2')
     const platform = map.createLayer('platforms', tileset)
 
-    this.makho = this.physics.add.sprite(600,500, 'makho')
+    this.makho = this.physics.add.sprite(2500,500, 'makho').setScale(0.125)
     this.physics.add.collider(this.makho, platform)
+    
+    this.gurami = this.physics.add.sprite(2000,500, 'gurami').setScale(0.1)
+    this.physics.add.collider(this.gurami, platform)
+    
+    this.nika = this.physics.add.sprite(1500, 200, 'nika').setScale(0.1)
+    this.physics.add.collider(this.nika, platform)
+    
+    this.nikolozi = this.physics.add.sprite(900,500, 'nikolozi').setScale(0.1)
+    this.physics.add.collider(this.nikolozi, platform)
+
+    this.rostomi = this.physics.add.sprite(600,500, 'rostomi').setScale(0.1)
+    this.physics.add.collider(this.rostomi, platform)
 
     platform.setCollisionByExclusion([-1], true)
 

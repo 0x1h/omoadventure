@@ -29,7 +29,7 @@ export class MenuScene extends Phaser.Scene {
     this.placeButtons()
 
     this.themeSound = this.sound.add('theme', { loop: true })
-    // this.themeSound.play()
+    this.themeSound.play()
 
     if (this.infoModal) {
       this.infoModal.visible = this.showModal
@@ -56,7 +56,7 @@ export class MenuScene extends Phaser.Scene {
       .setScale(0.3)
       .setInteractive({ cursor: 'pointer' })
       .on('pointerdown', () => {
-        this.scene.start('Playground')
+        this.scene.start('Home')
         this.themeSound.destroy()
       })
       .on('pointerover', () => {

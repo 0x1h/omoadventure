@@ -7,7 +7,7 @@ import { Playground } from './scenes/Playground'
 
 const config = {
   ...SHARED_CONFIG,
-  // scene: [new MenuScene(SHARED_CONFIG), Playground],
+  // scene: [new MenuScene(SHARED_CONFIG), Home, Playground],
   scene: [Playground, Home]
 }
 
