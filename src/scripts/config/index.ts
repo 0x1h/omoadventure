@@ -11,10 +11,6 @@ export const SHARED_CONFIG = {
     height: DEFAULT_HEIGHT
   },
   physics: {
-    default: 'arcade',
-    arcade: {
-      debug: false,
-      gravity: { y: 400 }
-    }
+    default: "arcade",
   }
 }
