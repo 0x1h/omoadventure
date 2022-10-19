@@ -21,7 +21,25 @@ export class Home extends Phaser.Scene {
     this.load.image('laptop', 'assets/sprites/laptop.png')
     this.load.tilemapTiledJSON('house', 'assets/sprites/house_interior.json')
     this.load.image('player', 'assets/sprites/player/movements/idle01.png')
-    this.load.image('tiles-1', 'assets/sprites/house_inside.png')
+    this.load.image('tilesSETSET', 'assets/sprites/house_inside.png')
+
+    const progressBar = this.add.graphics()
+    const progressBox = this.add.graphics()
+
+    const text = this.add.text(240, 350, 'LOADING...', { color: "#FFF", fontSize: "32px" });
+
+    progressBox.fillStyle(0x222222, 0.8)
+    progressBox.fillRect(240, 270, 320, 50)
+
+    this.load.on('progress', function (value) {
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(250, 280, 300 * value, 30);
+  });
+    this.load.on('complete', function () {
+      progressBar.destroy()
+      text.destroy()
+    })
   }
 
   create() {
@@ -31,7 +49,7 @@ export class Home extends Phaser.Scene {
     this.laptop.setScale(0.1)
 
     const map = this.make.tilemap({ key: 'house' })
-    const tileset = map.addTilesetImage('house_interior', 'tiles-1')
+    const tileset = map.addTilesetImage('house_interior', 'tilesSETSET')
     const platform = map.createLayer('house_interior_platform', tileset)
 
     platform.setCollisionByExclusion([-1], true)
@@ -39,6 +57,8 @@ export class Home extends Phaser.Scene {
     this.player = this.createPlayer().setGravityY(200)
     this.physics.add.collider(this.player, platform)
     this.physics.add.collider(this.laptop, platform)
+
+    this.handleJump()
 
     this.cursors = this.input.keyboard.createCursorKeys()
     this.physics.add.collider(this.player, this.laptop, () => {
@@ -49,6 +69,49 @@ export class Home extends Phaser.Scene {
 
     this.followCamera(this.player)
     this.alert = new Alert(this)
+  }
+
+  handleJump() {
+    this.input.keyboard.on(
+      'keydown-SPACE',
+      () => {
+        this.player!.body.velocity.y = -100
+      },
+      this
+    )
+
+    this.input.keyboard.on(
+      'keydown-RIGHT',
+      () => {
+        this.player!.body.velocity.x = 200
+        this.player!.flipX = false
+      },
+      this
+    )
+    this.input.keyboard.on(
+      'keydown-LEFT',
+      () => {
+        this.player!.body.velocity.x = -200
+        this.player!.flipX = true
+      },
+      this
+    )
+
+    this.input.keyboard.on(
+      'keyup-LEFT',
+      () => {
+        this.player?.setVelocityX(0)
+      },
+      this
+    )
+
+    this.input.keyboard.on(
+      'keyup-RIGHT',
+      () => {
+        this.player?.setVelocityX(0)
+      },
+      this
+    )
   }
 
   createPlayer() {
@@ -67,23 +130,6 @@ export class Home extends Phaser.Scene {
       if(this.player!.x >= 1090 && this.player!.y >= 247){
         this.scene.start('Playground')
       }
-    }
-    const { left, right, space } = this.cursors as Phaser.Types.Input.Keyboard.CursorKeys
-
-    this.alert!.x = this.player!.x - 50
-    this.alert!.y = this.player!.y - 100
-
-    if (this.player?.body.touching)
-      if (left.isDown) {
-        this.player?.setVelocityX(-200)
-        this.player!.flipX = true
-      }
-    if (right.isDown) {
-      this.player?.setVelocityX(200)
-      this.player!.flipX = false
-    }
-    if (space.isDown) {
-      this.player?.setVelocityY(-200)
     }
   }
 }

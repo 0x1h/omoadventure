@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 
-import Player from './Player'
-import Elevator from './Elevator'
+
+import { loadPortals } from './utils/loadPortals'
 
 import { SHARED_CONFIG } from '../../config'
 
@@ -21,10 +21,9 @@ export class Playground extends Phaser.Scene {
   callback_hell_sign: Phaser.Physics.Arcade.Sprite
   callback_hell_end: Phaser.GameObjects.Image
 
-  _moveElevator_: boolean 
-
-  elevator_sign: Phaser.GameObjects.Image
-  elevator: Phaser.Physics.Arcade.Image
+  portal_sign: Phaser.GameObjects.Image
+  portal_in: Phaser.GameObjects.Sprite
+  portal_out: Phaser.GameObjects.Sprite
 
   portal: Phaser.GameObjects.Sprite
 
@@ -37,9 +36,6 @@ export class Playground extends Phaser.Scene {
   constructor() {
     super({
       key: 'Playground',
-      physics: {
-        arcade: {}
-      }
     })
     this.cursors = null
     this.collision = { to: null }
@@ -61,6 +57,16 @@ export class Playground extends Phaser.Scene {
       frameHeight: 460
     })
 
+    this.load.spritesheet('portal-in', 'assets/sprites/ending-portal.png', {
+      frameWidth: 275,
+      frameHeight: 460
+    })
+
+    this.load.spritesheet('portal-out', 'assets/sprites/ending-portal.png', {
+      frameWidth: 275,
+      frameHeight: 460
+    })
+
     this.load.image('gurami_speech', 'assets/speech_modal/gurami_speech.png')
     this.load.image('callback-hell.sign', 'assets/sprites/callback_hell.png')
     this.load.image('callback-hell-end', 'assets/sprites/callback_hell_end.png')
@@ -68,11 +74,28 @@ export class Playground extends Phaser.Scene {
     this.load.image('makho_speech', 'assets/speech_modal/maxo_speech.png')
     this.load.image('nikolozi_speech', 'assets/speech_modal/nikolozi_speech.png')
     this.load.image('nika_speech', 'assets/speech_modal/nika_speech.png')
-    this.load.image('elevator-sign', 'assets/sprites/elevator-sign.png')
-    this.load.image('elevator', 'assets/sprites/elevator.png')
+    this.load.image('portal-sign', 'assets/sprites/elevator-sign.png')
 
     this.load.image('player', 'assets/sprites/player/movements/idle01.png')
     this.cursors = this.input.keyboard.createCursorKeys()
+
+    const progressBar = this.add.graphics()
+    const progressBox = this.add.graphics()
+
+    const text = this.add.text(240, 350, 'AQAC COTAXANI DAVELODOT :D', { color: "#FFF", fontSize: "32px" });
+
+    progressBox.fillStyle(0x222222, 0.8)
+    progressBox.fillRect(240, 270, 320, 50)
+
+    this.load.on('progress', function (value) {
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(250, 280, 300 * value, 30);
+  });
+    this.load.on('complete', function () {
+      progressBar.destroy()
+      text.destroy()
+    })
   }
 
   create() {
@@ -80,16 +103,10 @@ export class Playground extends Phaser.Scene {
     this.callback_hell_end = this.add.image(2695, 100, 'callback-hell-end').setScale(0.9)
     this.config = SHARED_CONFIG
     this.showModal = false
-    this._moveElevator_ = false
 
     this.handleJump()
 
-    this.anims.create({
-      key: 'play-portal',
-      frames: this.anims.generateFrameNumbers('portal', { start: 0, end: 7 }),
-      frameRate: 15,
-      repeat: -1
-    })
+    loadPortals(this.anims)
 
     const map = this.make.tilemap({ key: 'map' })
     const tileset = map.addTilesetImage('grass_template', 'tiles-1')
@@ -97,19 +114,19 @@ export class Playground extends Phaser.Scene {
     map.createLayer('secondary_layer', tileset2)
     const platform = map.createLayer('platform', tileset)
 
-    this.makho = this.physics.add.sprite(2500, 500, 'makho').setScale(0.125).setImmovable()
+    this.makho = this.physics.add.sprite(2350, 340, 'makho').setScale(0.125).setImmovable()
     this.physics.add.collider(this.makho, platform)
 
-    this.gurami = this.physics.add.sprite(2000, 500, 'gurami').setScale(0.1).setImmovable()
+    this.gurami = this.physics.add.sprite(2000, 250, 'gurami').setScale(0.1).setImmovable()
     this.physics.add.collider(this.gurami, platform)
 
     this.callback_hell_sign = this.physics.add.sprite(2500, 350, 'callback-hell.sign').setScale(0.05).setImmovable()
     this.physics.add.collider(this.callback_hell_sign, platform)
 
-    this.nika = this.physics.add.sprite(1600, 450, 'nika').setScale(0.06).setImmovable()
+    this.nika = this.physics.add.sprite(1600, 590, 'nika').setScale(0.06).setImmovable()
     this.physics.add.collider(this.nika, platform)
 
-    this.elevator_sign = this.add.image(1650, 560, 'elevator-sign').setScale(0.1)
+    this.portal_sign = this.add.image(1650, 560, 'portal-sign').setScale(0.1)
 
     this.nikolozi = this.physics.add.sprite(250, 190, 'nikolozi').setScale(0.07).setImmovable()
     this.physics.add.collider(this.nikolozi, platform)
@@ -117,32 +134,46 @@ export class Playground extends Phaser.Scene {
     this.rostomi = this.physics.add.sprite(800, 210, 'rostomi').setScale(0.07).setImmovable()
     this.physics.add.collider(this.rostomi, platform)
 
-    this.portal = this.add.sprite(3050, 200, 'portal').setScale(0.5)
-    this.portal.play('play-portal', true)
-
-    platform.setCollisionByExclusion([-1], true)
+    this.portal = this.physics.add.sprite(3050, 200, 'portal').setScale(0.5).setImmovable()
+    this.portal_in = this.physics.add.sprite(1760, 600, 'portal-in').setScale(0.2).setAngle(90).setInteractive().setImmovable()
+    this.portal_out = this.physics.add.sprite(1760, 270, 'portal-out').setScale(0.2).setAngle(90)
 
     this.player = this.createPlayer().setImmovable()
     this.physics.add.collider(this.player, platform)
 
-    this.cursors = this.input.keyboard.createCursorKeys()
-
-    this.elevator = this.physics.add.image(1770, 600, 'elevator').setImmovable().setScale(0.1)
-
     this.physics.add.collider(
       this.player,
-      this.elevator,
+      this.portal_in,
       () => {
-        this.elevator.body.velocity.y = -100
+        this.player.y = this.portal_out.y 
+        this.player.x = this.portal_out.x + 40
+        this.player!.body.velocity.y = -300
+        this.player!.body.velocity.x = -200
       },
       undefined,
       this
     )
 
-    this.followCamera(this.player)
+    this.physics.add.collider(
+      this.player,
+      this.portal,
+      () => {
+        this.game.destroy(false)
+        window.location.replace('https://omoadventurecallback.netlify.app');
+      },
+      undefined,
+      this
+    )
 
-    this.physics.add.collider(this.elevator, this.player)
-    this.physics.add.collider(this.elevator, platform)
+    this.portal.play('play-portal', true)
+    this.portal_in.play('play-portal', true)
+    this.portal_out.play('play-portal', true)
+
+    platform.setCollisionByExclusion([-1], true)
+
+    this.cursors = this.input.keyboard.createCursorKeys()
+
+    this.followCamera(this.player)
 
     this.addPhysicsCollider(this.rostomi, 'rostomi_speech')
     this.addPhysicsCollider(this.nikolozi, 'nikolozi_speech')

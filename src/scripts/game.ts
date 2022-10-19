@@ -7,9 +7,7 @@ import { Playground } from './scenes/Playground'
 
 const config = {
   ...SHARED_CONFIG,
-  // scene: [new MenuScene(SHARED_CONFIG), Home, Playground],
-  scene: [Playground]
-}
+  scene: [new MenuScene(SHARED_CONFIG), Home, Playground],}
 
 window.addEventListener('load', () => {
   new Phaser.Game(config as any)

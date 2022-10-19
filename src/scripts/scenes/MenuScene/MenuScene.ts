@@ -5,6 +5,7 @@ export class MenuScene extends Phaser.Scene {
   infoButton: null | Phaser.GameObjects.Image
   infoModal: null | Phaser.GameObjects.Image
   showModal: boolean
+
   themeSound: any
 
   public config: typeof SHARED_CONFIG
@@ -22,13 +23,31 @@ export class MenuScene extends Phaser.Scene {
 
   preload() {
     this.createAssets()
+
+    const progressBar = this.add.graphics()
+    const progressBox = this.add.graphics()
+
+    const text = this.add.text(240, 350, 'ERTI WAMI DAVELODOT ;D', { color: "#FFF", fontSize: "32px" });
+
+    progressBox.fillStyle(0x222222, 0.8)
+    progressBox.fillRect(240, 270, 320, 50)
+
+    this.load.on('progress', function (value) {
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(250, 280, 300 * value, 30);
+  });
+    this.load.on('complete', function () {
+      progressBar.destroy()
+      text.destroy()
+    })
   }
 
   create() {
     this.add.image(0, 0, 'background').setOrigin(0)
     this.placeButtons()
 
-    this.themeSound = this.sound.add('theme', { loop: true })
+    this.themeSound = this.sound.add('theme', { loop: true, volume: 0.1 })
     this.themeSound.play()
 
     if (this.infoModal) {
